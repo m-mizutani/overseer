@@ -21,6 +21,7 @@ func main() {
 	}
 
 	seer := overseer.New()
+	defer seer.Close()
 
 	if opts.DevName != "" {
 		err := seer.SetPcapDev(opts.DevName)
@@ -38,4 +39,8 @@ func main() {
 		}
 	}
 
+	err := seer.Loop()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
