@@ -83,9 +83,11 @@ func (x *Overseer) Read(readCount int) error {
 	}
 
 	count := 0
-	const timeout time.Duration = time.Second
+	const interval time.Duration = time.Second
+	const timeout time.Duration = time.Second * 60
 	packets := x.packetSource.Packets()
-	ticker := time.Tick(timeout)
+	intervalTicker := time.Tick(interval)
+	timeoutTicker := time.Tick(timeout)
 
 	for {
 		select {
@@ -101,8 +103,11 @@ func (x *Overseer) Read(readCount int) error {
 				return nil
 			}
 
-		case <-ticker:
-			log.Println("tick")
+		case <-intervalTicker:
+			// log.Println("tick")
+
+		case <-timeoutTicker:
+			x.ssnTable.Timeout(time.Now().Add(-timeout))
 		}
 	}
 }
